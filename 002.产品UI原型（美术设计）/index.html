@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>财务管家 - Mindful Stewardship</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ========================================
+       CSS Reset & Base
+       ======================================== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: 'WenQuanYi Zen Hei', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-weight: 500;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ========================================
+       Layout Container
+       ======================================== */
+    .app-layout {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+      background: linear-gradient(90deg, rgb(254, 248, 244) 0%, rgb(254, 248, 244) 100%),
+                  linear-gradient(90deg, rgb(255, 255, 255) 0%, rgb(255, 255, 255) 100%);
+      padding-left: 256px;
+      position: relative;
+    }
+
+    /* ========================================
+       Side Navigation Bar (Desktop)
+       ======================================== */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 256px;
+      height: 100vh;
+      background-color: #fef8f4;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+      z-index: 100;
+      box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1),
+                  0px 4px 6px -4px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-brand {
+      padding: 0 16px;
+      margin-bottom: 40px;
+    }
+
+    .sidebar-brand-name {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: #864e5a;
+      line-height: 28px;
+    }
+
+    .sidebar-brand-subtitle {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      color: #8e8e8e;
+      line-height: 24px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .sidebar-nav-item:hover:not(.active) {
+      background-color: rgba(255, 183, 197, 0.3);
+    }
+
+    .sidebar-nav-item.active {
+      background-color: #ffb7c5;
+    }
+
+    .sidebar-nav-item .nav-icon {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .sidebar-nav-item .nav-icon img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .sidebar-nav-item .nav-label {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #514345;
+      line-height: 16px;
+      letter-spacing: 0.7px;
+      white-space: nowrap;
+    }
+
+    .sidebar-nav-item.active .nav-label {
+      color: #7b4551;
+    }
+
+    .sidebar-add-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 77px;
+      border-radius: 9999px;
+      background: linear-gradient(138.05deg, rgb(255, 183, 197) 0%, rgb(201, 184, 232) 100%);
+      box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1),
+                  0px 4px 6px -4px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      border: none;
+      position: relative;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .sidebar-add-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0px 12px 18px -3px rgba(0, 0, 0, 0.15),
+                  0px 6px 8px -4px rgba(0, 0, 0, 0.15);
+    }
+
+    .sidebar-add-btn .btn-icon {
+      width: 14px;
+      height: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-add-btn .btn-icon img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .sidebar-add-btn .btn-label {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #ffffff;
+      line-height: 16px;
+      letter-spacing: 0.7px;
+      white-space: nowrap;
+    }
+
+    /* ========================================
+       Main Content Canvas
+       ======================================== */
+    .main-content {
+      flex: 1;
+      min-width: 1200px;
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    /* ========================================
+       Header - Welcome Section
+       ======================================== */
+    .welcome-section {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .welcome-heading {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #1d1b19;
+      line-height: 40px;
+      letter-spacing: -0.64px;
+      word-break: break-word;
+    }
+
+    .welcome-date {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: #514345;
+      line-height: 24px;
+    }
+
+    /* ========================================
+       Monthly Summary - Bento Grid
+       ======================================== */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: 241px;
+      gap: 24px;
+    }
+
+    /* Balance Card (spans 2 columns) */
+    .balance-card {
+      grid-column: 1 / span 2;
+      background-color: #fff0f3;
+      border-radius: 24px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0px 4px 20px 0px rgba(255, 183, 197, 0.15);
+      overflow: hidden;
+    }
+
+    .balance-label {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #864e5a;
+      line-height: 16px;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      margin-bottom: 13px;
+    }
+
+    .balance-amount {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      color: #1d1b19;
+    }
+
+    .balance-currency {
+      font-size: 36px;
+      line-height: 44px;
+    }
+
+    .balance-value {
+      font-size: 36px;
+      line-height: 44px;
+    }
+
+    .balance-divider {
+      border-top: 1px solid rgba(134, 78, 90, 0.1);
+      margin-top: 32px;
+      padding-top: 25px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .balance-sub {
+      flex: 1;
+      min-width: 1px;
+    }
+
+    .balance-sub-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .balance-sub-label .sub-icon {
+      width: 10.667px;
+      height: 10.667px;
+      flex-shrink: 0;
+    }
+
+    .balance-sub-label .sub-icon img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .balance-sub-label .sub-text {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: #514345;
+      line-height: 14px;
+      white-space: nowrap;
+    }
+
+    .balance-sub-value {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #1d1b19;
+      line-height: 28px;
+    }
+
+    /* Savings Goal Card */
+    .savings-card {
+      background-color: #ffffff;
+      border: 1px solid #fff0f3;
+      border-radius: 24px;
+      padding: 33px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      filter: drop-shadow(0px 4px 10px rgba(255, 183, 197, 0.15));
+    }
+
+    .savings-label {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #514345;
+      line-height: 16px;
+      letter-spacing: 0.7px;
+      margin-bottom: 16px;
+    }
+
+    .savings-progress-ring {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 16px;
+    }
+
+    .savings-ring-container {
+      width: 96px;
+      height: 96px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .savings-ring-container .ring-bg {
+      position: absolute;
+      inset: 0;
+      width: 96px;
+      height: 96px;
+    }
+
+    .savings-ring-container .ring-bg img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .savings-ring-percent {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #864e5a;
+      line-height: 28px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .savings-goal-text {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #514345;
+      line-height: 20px;
+      text-align: center;
+    }
+
+    .savings-goal-text .goal-amount {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      font-weight: 600;
+      color: #864e5a;
+    }
+
+    /* ========================================
+       Recent Transactions Section
+       ======================================== */
+    .transactions-section {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .transactions-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .transactions-title {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: #1d1b19;
+      line-height: 28px;
+      white-space: nowrap;
+    }
+
+    .transactions-view-all {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #864e5a;
+      line-height: 16px;
+      letter-spacing: 0.7px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .transactions-view-all:hover {
+      text-decoration: underline;
+    }
+
+    /* Transaction Day Group */
+    .tx-day-group {
+      display: flex;
+      flex-direction: column;
+      isolation: isolate;
+    }
+
+    .tx-day-header {
+      padding-bottom: 16px;
+      z-index: 2;
+      position: relative;
+    }
+
+    .tx-day-header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      backdrop-filter: blur(6px);
+      background: rgba(254, 248, 244, 0.8);
+    }
+
+    .tx-day-label {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #8e8e8e;
+      line-height: 16px;
+      letter-spacing: 0.7px;
+      white-space: nowrap;
+    }
+
+    .tx-day-summary {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: #8e8e8e;
+      line-height: 14px;
+      white-space: nowrap;
+    }
+
+    .tx-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1;
+      position: relative;
+    }
+
+    /* Transaction Card */
+    .tx-card {
+      display: flex;
+      align-items: center;
+      padding: 17px;
+      background-color: #ffffff;
+      border: 1px solid #fff0f3;
+      border-radius: 12px;
+      filter: drop-shadow(0px 4px 10px rgba(255, 183, 197, 0.15));
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .tx-card:hover {
+      transform: translateY(-1px);
+      filter: drop-shadow(0px 6px 14px rgba(255, 183, 197, 0.25));
+    }
+
+    .tx-card-icon-wrap {
+      width: 64px;
+      height: 48px;
+      flex-shrink: 0;
+      padding-right: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .tx-card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .tx-card-icon.teal {
+      background-color: rgba(156, 243, 223, 0.3);
+    }
+
+    .tx-card-icon.pink {
+      background-color: rgba(255, 183, 197, 0.3);
+    }
+
+    .tx-card-icon.green {
+      background-color: rgba(128, 214, 195, 0.3);
+    }
+
+    .tx-card-icon.red-pink {
+      background-color: rgba(255, 185, 181, 0.3);
+    }
+
+    .tx-card-icon img {
+      width: 16px;
+      height:  16px;
+    }
+
+    .tx-card-info {
+      flex: 1;
+      min-width: 1px;
+    }
+
+    .tx-card-name {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: #1d1b19;
+      line-height: 24px;
+    }
+
+    .tx-card-category {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #8e8e8e;
+      line-height: 20px;
+    }
+
+    .tx-card-amount {
+      flex-shrink: 0;
+      text-align: right;
+    }
+
+    .tx-card-amount .amount-value {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 28px;
+      white-space: nowrap;
+    }
+
+    .tx-card-amount .amount-value.expense {
+      color: #1d1b19;
+    }
+
+    .tx-card-amount .amount-value.income {
+      color: #006b5c;
+    }
+
+    /* ========================================
+       Responsive Design
+       ======================================== */
+    @media (max-width: 1024px) {
+      .app-layout {
+        padding-left: 0;
+      }
+
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        padding: 24px;
+      }
+
+      .bento-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+
+      .balance-card {
+        grid-column: 1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .main-content {
+        padding: 16px;
+        gap: 24px;
+      }
+
+      .welcome-heading {
+        font-size: 24px;
+        line-height: 32px;
+      }
+
+      .balance-currency,
+      .balance-value {
+        font-size: 28px;
+        line-height: 36px;
+      }
+
+      .balance-card {
+        padding: 20px;
+      }
+
+      .balance-divider {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .tx-card {
+        padding: 12px;
+      }
+
+      .tx-card-icon-wrap {
+        width: 52px;
+      }
+
+      .tx-card-icon {
+        width: 40px;
+        height: 40px;
+      }
+
+      .tx-card-name {
+        font-size: 14px;
+        line-height: 20px;
+      }
+
+      .tx-card-category {
+        font-size: 12px;
+        line-height: 16px;
+      }
+
+      .tx-card-amount .amount-value {
+        font-size: 16px;
+        line-height: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout" data-node-id="1:2">
+
+    <!-- ========================================
+         Side Navigation Bar
+         ======================================== -->
+    <aside class="sidebar" data-node-id="1:119">
+      <!-- Brand -->
+      <div>
+        <div class="sidebar-brand" data-node-id="1:122">
+          <h2 class="sidebar-brand-name" data-node-id="1:124">财务管家</h2>
+          <p class="sidebar-brand-subtitle" data-node-id="1:126">Mindful Stewardship</p>
+        </div>
+
+        <!-- Navigation Items -->
+        <nav class="sidebar-nav" data-node-id="1:127">
+          <div class="sidebar-nav-item active" data-node-id="1:128">
+            <span class="nav-icon">
+              <img src="assets/icon-home.svg" alt="首页" data-node-id="1:129">
+            </span>
+            <span class="nav-label" data-node-id="1:132">首页</span>
+          </div>
+
+          <div class="sidebar-nav-item" data-node-id="1:133">
+            <span class="nav-icon">
+              <img src="assets/icon-stats.svg" alt="统计" data-node-id="1:134">
+            </span>
+            <span class="nav-label" data-node-id="1:137">统计</span>
+          </div>
+
+          <div class="sidebar-nav-item" data-node-id="1:138">
+            <span class="nav-icon">
+              <img src="assets/icon-account.svg" alt="账户" data-node-id="1:139">
+            </span>
+            <span class="nav-label" data-node-id="1:142">账户</span>
+          </div>
+
+          <div class="sidebar-nav-item" data-node-id="1:143">
+            <span class="nav-icon">
+              <img src="assets/icon-profile.svg" alt="我的" data-node-id="1:144">
+            </span>
+            <span class="nav-label" data-node-id="1:147">我的</span>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Add Transaction Button -->
+      <button class="sidebar-add-btn" data-node-id="1:148">
+        <span class="btn-icon">
+          <img src="assets/icon-add.svg" alt="+" data-node-id="1:150">
+        </span>
+        <span class="btn-label" data-node-id="1:153">记账</span>
+      </button>
+    </aside>
+
+    <!-- ========================================
+         Main Content
+         ======================================== -->
+    <main class="main-content" data-node-id="1:3">
+
+      <!-- Welcome Header -->
+      <section class="welcome-section" data-node-id="1:4">
+        <h3 class="welcome-heading" data-node-id="1:6">早安， stewardship</h3>
+        <p class="welcome-date" data-node-id="1:8">今天是 2024年5月24日，保持正念消费。</p>
+      </section>
+
+      <!-- Monthly Summary Bento Grid -->
+      <section class="bento-grid" data-node-id="1:9">
+
+        <!-- Main Balance Card -->
+        <div class="balance-card" data-node-id="1:10">
+          <div class="balance-header" data-node-id="1:11">
+            <p class="balance-label" data-node-id="1:12">本月结余</p>
+            <div class="balance-amount" data-node-id="1:13">
+              <span class="balance-currency" data-node-id="1:14">¥</span>
+              <span class="balance-value" data-node-id="1:15">12,450.00</span>
+            </div>
+          </div>
+
+          <div class="balance-footer">
+            <div class="balance-divider" data-node-id="1:17">
+              <!-- Income -->
+              <div class="balance-sub" data-node-id="1:18">
+                <div class="balance-sub-label" data-node-id="1:19">
+                  <span class="sub-icon">
+                    <img src="assets/icon-income.svg" alt="" data-node-id="1:20">
+                  </span>
+                  <span class="sub-text" data-node-id="1:22">本月收入</span>
+                </div>
+                <p class="balance-sub-value" data-node-id="1:24">¥18,000</p>
+              </div>
+
+              <!-- Expense -->
+              <div class="balance-sub" data-node-id="1:25">
+                <div class="balance-sub-label" data-node-id="1:26">
+                  <span class="sub-icon">
+                    <img src="assets/icon-expense.svg" alt="" data-node-id="1:27">
+                  </span>
+                  <span class="sub-text" data-node-id="1:29">本月支出</span>
+                </div>
+                <p class="balance-sub-value" data-node-id="1:31">¥5,550</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Savings Goal Card -->
+        <div class="savings-card" data-node-id="1:32">
+          <div>
+            <p class="savings-label" data-node-id="1:35">储蓄进度</p>
+            <div class="savings-progress-ring" data-node-id="1:36">
+              <div class="savings-ring-container">
+                <div class="ring-bg">
+                  <img src="assets/savings-ring.svg" alt="" data-node-id="1:37">
+                </div>
+                <span class="savings-ring-percent" data-node-id="1:41">75%</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="savings-goal-text" data-node-id="1:43">
+            距离目标"新相机"还差 <span class="goal-amount">¥1,200</span>
+          </p>
+        </div>
+
+      </section>
+
+      <!-- Recent Transactions Section -->
+      <section class="transactions-section" data-node-id="1:44">
+        <div class="transactions-header" data-node-id="1:45">
+          <h4 class="transactions-title" data-node-id="1:47">最近记账</h4>
+          <span class="transactions-view-all" data-node-id="1:49">查看全部</span>
+        </div>
+
+        <div class="transactions-list" data-node-id="1:50">
+
+          <!-- Today Group -->
+          <div class="tx-day-group" data-node-id="1:51">
+            <div class="tx-day-header" data-node-id="1:52">
+              <div class="tx-day-header-inner" data-node-id="1:53">
+                <span class="tx-day-label" data-node-id="1:55">今天 · 5月24日</span>
+                <span class="tx-day-summary" data-node-id="1:57">支出 ¥128.00</span>
+              </div>
+            </div>
+
+            <div class="tx-list" data-node-id="1:58">
+              <!-- Transaction 1: Lunch -->
+              <div class="tx-card" data-node-id="1:59">
+                <div class="tx-card-icon-wrap">
+                  <div class="tx-card-icon teal" data-node-id="1:61">
+                    <img src="assets/icon-food.svg" alt="餐饮" data-node-id="1:62">
+                  </div>
+                </div>
+                <div class="tx-card-info">
+                  <p class="tx-card-name" data-node-id="1:66">午餐 - 泰式料理</p>
+                  <p class="tx-card-category" data-node-id="1:68">餐饮饮食</p>
+                </div>
+                <div class="tx-card-amount">
+                  <span class="amount-value expense" data-node-id="1:71">-¥68.00</span>
+                </div>
+              </div>
+
+              <!-- Transaction 2: Taxi -->
+              <div class="tx-card" data-node-id="1:72">
+                <div class="tx-card-icon-wrap">
+                  <div class="tx-card-icon pink" data-node-id="1:74">
+                    <img src="assets/icon-taxi.svg" alt="出行" data-node-id="1:75">
+                  </div>
+                </div>
+                <div class="tx-card-info">
+                  <p class="tx-card-name" data-node-id="1:79">打车回公司</p>
+                  <p class="tx-card-category" data-node-id="1:81">交通出行</p>
+                </div>
+                <div class="tx-card-amount">
+                  <span class="amount-value expense" data-node-id="1:84">-¥60.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Yesterday Group -->
+          <div class="tx-day-group" data-node-id="1:85">
+            <div class="tx-day-header" data-node-id="1:86">
+              <div class="tx-day-header-inner" data-node-id="1:87">
+                <span class="tx-day-label" data-node-id="1:89">昨天 · 5月23日</span>
+                <span class="tx-day-summary" data-node-id="1:91">支出 ¥350.00 · 收入 ¥500.00</span>
+              </div>
+            </div>
+
+            <div class="tx-list" data-node-id="1:92">
+              <!-- Transaction 3: Second-hand Income -->
+              <div class="tx-card" data-node-id="1:93">
+                <div class="tx-card-icon-wrap">
+                  <div class="tx-card-icon green" data-node-id="1:95">
+                    <img src="assets/icon-secondhand.svg" alt="收入" data-node-id="1:96">
+                  </div>
+                </div>
+                <div class="tx-card-info">
+                  <p class="tx-card-name" data-node-id="1:100">二手平台收入</p>
+                  <p class="tx-card-category" data-node-id="1:102">其他收入</p>
+                </div>
+                <div class="tx-card-amount">
+                  <span class="amount-value income" data-node-id="1:105">+¥500.00</span>
+                </div>
+              </div>
+
+              <!-- Transaction 4: Supermarket -->
+              <div class="tx-card" data-node-id="1:106">
+                <div class="tx-card-icon-wrap">
+                  <div class="tx-card-icon red-pink" data-node-id="1:108">
+                    <img src="assets/icon-shopping.svg" alt="购物" data-node-id="1:109">
+                  </div>
+                </div>
+                <div class="tx-card-info">
+                  <p class="tx-card-name" data-node-id="1:113">超市采购</p>
+                  <p class="tx-card-category" data-node-id="1:115">日常购物</p>
+                </div>
+                <div class="tx-card-amount">
+                  <span class="amount-value expense" data-node-id="1:118">-¥350.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+</body>
+</html>

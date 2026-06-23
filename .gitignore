@@ -1,0 +1,11 @@
+# Claude Code
+.claude/
+.mcp.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Reference screenshots (large files)
+reference-screenshot.png
